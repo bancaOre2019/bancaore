@@ -14,6 +14,7 @@
 		$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		
 		$codiceUt = $_SESSION['cod'];
+		$saldo = $_SESSION['saldo'];
 		
 		$stmt = $conn->prepare("SELECT nome, cognome, foto
 								  FROM utenti
@@ -38,7 +39,7 @@
 			$categorie[] = ucfirst(strtolower($row['categoria']));
         }
 		
-		$ret = array("nome"=>$nome, "categorie"=>$categorie, "codici"=>$codici, "foto"=>$foto);
+		$ret = array("nome"=>$nome, "categorie"=>$categorie, "codici"=>$codici, "foto"=>$foto, "saldo"=>$saldo);
 		
 		echo json_encode($ret);
 		$conn = null;

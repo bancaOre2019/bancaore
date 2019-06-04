@@ -57,12 +57,13 @@
 		/*** CALCOLO ORE SALDO ***/
 		
 		$saldo = strval($oreCredito - $oreDebito);
+		$_SESSION['saldo'] = $saldo;
 		
 		/*** CALCOLO LAVORI ***/
 		
 		$stmt = $conn->prepare("SELECT count(codAnnuncio) AS lavoriInCorso 
 								  FROM annunci 
-								 WHERE committente = :codCom AND LCT = 'L' 
+								 WHERE committente = :codCom AND LCT = 'C'
 							  GROUP BY committente");
 							  
 		$stmt->bindParam(':codCom', $codiceUt, PDO::PARAM_INT);
@@ -76,6 +77,15 @@
 		if ($lavori === null) {
 			$lavori = 0;
 		}
+		
+		$stmt = "SELECT * FROM categorie";
+		$categorie = array();
+		$codici = array();
+		foreach ($conn->query($stmt) as $row) {
+			$codici[] = intval($row['codCategoria']);
+			$categorie[] = ucfirst(strtolower($row['categoria']));
+        }
+		
 		/*** DATI + DETTAGLI ***/
 		
 		$stmt = $conn->prepare("SELECT nomeUtente, nome, cognome, dataNascita, telefono, email, indirizzo, paese, cap, bio, categoria, foto
@@ -102,7 +112,7 @@
 		
 		// foto
 		
-		$dati = array($oreCredito, $oreDebito, $saldo, $username, $nome, $dataNascita, $telefono, $email, $indirizzo, $paese, $cap, $bio, $categoria, $lavori, $foto);
+		$dati = array($oreCredito, $oreDebito, $saldo, $username, $nome, $dataNascita, $telefono, $email, $indirizzo, $paese, $cap, $bio, $categoria, $lavori, $foto, "categorie"=>$categorie, "codici"=>$codici);
 		echo json_encode($dati);
 		
 	} catch(PDOException $ex){
